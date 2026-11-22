@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#080b11] text-slate-100 font-sans antialiased min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200;
+  }
+}
+
+/* Custom cyber / radar aesthetics */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.radar-glow {
+  box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.15);
+}
+
+.radar-glow-red {
+  box-shadow: 0 0 25px -5px rgba(239, 68, 68, 0.25);
+}
+
+.radar-glow-green {
+  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b111e;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
