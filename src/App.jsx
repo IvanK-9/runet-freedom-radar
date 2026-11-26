@@ -10,7 +10,6 @@ import SimulatorModal from './components/SimulatorModal';
 import MethodologyModal from './components/MethodologyModal';
 
 import { historicalEvents } from './data/historicalEvents';
-import { fotnData } from './data/fotnData';
 import { 
   calculateBalanceAtDate, 
   generateTimelineSeries, 
@@ -39,15 +38,13 @@ export default function App() {
 
   // Dual index calculation for current date
   const { 
-    balance, 
     iNar, 
     iTech, 
     deltaGap, 
     gapStatus, 
     pressureWeight, 
     defenseWeight, 
-    failWeight, 
-    activeEventsCount 
+    failWeight 
   } = useMemo(() => {
     return calculateBalanceAtDate(events, currentDate);
   }, [events, currentDate]);

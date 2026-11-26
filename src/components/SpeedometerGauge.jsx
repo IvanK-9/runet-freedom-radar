@@ -4,16 +4,13 @@ import {
   getTechStatus, 
   getNarrativeStatus 
 } from '../utils/calculator';
-import { Shield, ShieldAlert, Zap, AlertTriangle, Layers, Split, Radio, Info } from 'lucide-react';
+import { Radio, Zap } from 'lucide-react';
 
 export default function SpeedometerGauge({ 
   iTech = 0, 
   iNar = -85, 
   deltaGap = 85, 
-  gapStatus, 
-  pressureWeight = 0, 
-  defenseWeight = 0, 
-  failWeight = 0 
+  gapStatus 
 }) {
   const [needleView, setNeedleView] = useState('both'); // 'both' | 'tech' | 'nar'
   const resolvedGapStatus = gapStatus || getGapStatus(deltaGap);
@@ -96,8 +93,10 @@ export default function SpeedometerGauge({
         </div>
 
         {/* Needle Mode Selector */}
-        <div className="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-slate-800 text-[11px] font-mono">
+        <div role="tablist" aria-label="Режимы отображения стрелок" className="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-slate-800 text-[11px] font-mono">
           <button
+            role="tab"
+            aria-selected={needleView === 'both'}
             onClick={() => setNeedleView('both')}
             className={`px-2.5 py-1 rounded transition-all ${
               needleView === 'both' ? 'bg-cyan-500/20 text-cyan-300 font-semibold shadow-sm' : 'text-slate-400 hover:text-slate-200'
@@ -107,6 +106,8 @@ export default function SpeedometerGauge({
             Две стрелки
           </button>
           <button
+            role="tab"
+            aria-selected={needleView === 'tech'}
             onClick={() => setNeedleView('tech')}
             className={`px-2.5 py-1 rounded transition-all ${
               needleView === 'tech' ? 'bg-emerald-500/20 text-emerald-300 font-semibold shadow-sm' : 'text-slate-400 hover:text-slate-200'
@@ -116,6 +117,8 @@ export default function SpeedometerGauge({
             Сеть
           </button>
           <button
+            role="tab"
+            aria-selected={needleView === 'nar'}
             onClick={() => setNeedleView('nar')}
             className={`px-2.5 py-1 rounded transition-all ${
               needleView === 'nar' ? 'bg-purple-500/20 text-purple-300 font-semibold shadow-sm' : 'text-slate-400 hover:text-slate-200'

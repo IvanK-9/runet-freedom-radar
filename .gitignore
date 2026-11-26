@@ -30,3 +30,4 @@ dist-ssr
 
 # Local test databases
 *.db
+__pycache__/

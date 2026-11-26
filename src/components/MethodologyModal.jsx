@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, BookOpen, AlertCircle, Cpu, Radio, ShieldCheck, Scale, Globe, Zap, Split } from 'lucide-react';
+import { X, BookOpen, Scale, Globe, Zap, Split } from 'lucide-react';
 
 export default function MethodologyModal({ onClose }) {
   useEffect(() => {

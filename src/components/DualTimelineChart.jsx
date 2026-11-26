@@ -1,5 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { Calendar, Info, Shield, ShieldAlert, Award, Zap, Layers } from 'lucide-react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
+import { Calendar, Award, Layers } from 'lucide-react';
+
+// Chart dimensions in viewBox coordinates
+const WIDTH = 1000;
+const HEIGHT = 370;
+const PADDING = { top: 35, right: 55, bottom: 45, left: 60 };
+const PLOT_WIDTH = WIDTH - PADDING.left - PADDING.right;
+const PLOT_HEIGHT = HEIGHT - PADDING.top - PADDING.bottom;
 
 export default function DualTimelineChart({ 
   timelineData, 
@@ -9,68 +16,72 @@ export default function DualTimelineChart({
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const containerRef = useRef(null);
 
-  // Chart dimensions in viewBox coordinates
-  const width = 1000;
-  const height = 370;
-  const padding = { top: 35, right: 55, bottom: 45, left: 60 };
-
-  const plotWidth = width - padding.left - padding.right;
-  const plotHeight = height - padding.top - padding.bottom;
+  const width = WIDTH;
+  const height = HEIGHT;
+  const padding = PADDING;
 
   // Scales
-  const getX = (index) => {
-    return padding.left + (index / (timelineData.length - 1)) * plotWidth;
-  };
+  const getX = useCallback((index) => {
+    return PADDING.left + (index / (timelineData.length - 1)) * PLOT_WIDTH;
+  }, [timelineData.length]);
 
   // Y for Index (-100 to +100)
-  const getY = (val) => {
+  const getY = useCallback((val) => {
     const clamped = Math.max(-100, Math.min(100, val));
     const normalized = (clamped - (-100)) / 200; // 0 to 1
-    return padding.top + plotHeight - (normalized * plotHeight);
-  };
+    return PADDING.top + PLOT_HEIGHT - (normalized * PLOT_HEIGHT);
+  }, []);
 
   // Y for Freedom on the Net (0 to 100)
-  const getYFotn = (score) => {
+  const getYFotn = useCallback((score) => {
     const normalized = Math.max(0, Math.min(100, score)) / 100;
-    return padding.top + plotHeight - (normalized * plotHeight);
-  };
+    return PADDING.top + PLOT_HEIGHT - (normalized * PLOT_HEIGHT);
+  }, []);
 
   const zeroY = getY(0);
 
-  // Construct Paths for I_tech and I_nar
-  let techPath = "";
-  let narPath = "";
-  let fotnPath = "";
+  // Memoized SVG Paths for I_tech, I_nar and Reality Gap ribbon
+  const { techPath, narPath, fotnPath, gapAreaPath } = useMemo(() => {
+    let tPath = "";
+    let nPath = "";
+    let fPath = "";
 
-  timelineData.forEach((pt, i) => {
-    const x = getX(i);
-    const yTech = getY(pt.iTech);
-    const yNar = getY(pt.iNar);
-    const yFotn = getYFotn(pt.fotnScore);
+    timelineData.forEach((pt, i) => {
+      const x = getX(i);
+      const yTech = getY(pt.iTech);
+      const yNar = getY(pt.iNar);
+      const yFotn = getYFotn(pt.fotnScore);
 
-    if (i === 0) {
-      techPath += `M ${x} ${yTech} `;
-      narPath += `M ${x} ${yNar} `;
-      fotnPath += `M ${x} ${yFotn} `;
-    } else {
-      techPath += `L ${x} ${yTech} `;
-      narPath += `L ${x} ${yNar} `;
-      fotnPath += `L ${x} ${yFotn} `;
-    }
-  });
+      if (i === 0) {
+        tPath += `M ${x} ${yTech} `;
+        nPath += `M ${x} ${yNar} `;
+        fPath += `M ${x} ${yFotn} `;
+      } else {
+        tPath += `L ${x} ${yTech} `;
+        nPath += `L ${x} ${yNar} `;
+        fPath += `L ${x} ${yFotn} `;
+      }
+    });
 
-  // Construct shaded ribbon area between Tech and Nar (The Reality Gap Area)
-  let gapAreaPath = "";
-  if (timelineData.length > 0) {
-    gapAreaPath = `M ${getX(0)} ${getY(timelineData[0].iTech)} `;
-    for (let i = 1; i < timelineData.length; i++) {
-      gapAreaPath += `L ${getX(i)} ${getY(timelineData[i].iTech)} `;
+    let gAreaPath = "";
+    if (timelineData.length > 0) {
+      gAreaPath = `M ${getX(0)} ${getY(timelineData[0].iTech)} `;
+      for (let i = 1; i < timelineData.length; i++) {
+        gAreaPath += `L ${getX(i)} ${getY(timelineData[i].iTech)} `;
+      }
+      for (let i = timelineData.length - 1; i >= 0; i--) {
+        gAreaPath += `L ${getX(i)} ${getY(timelineData[i].iNar)} `;
+      }
+      gAreaPath += "Z";
     }
-    for (let i = timelineData.length - 1; i >= 0; i--) {
-      gapAreaPath += `L ${getX(i)} ${getY(timelineData[i].iNar)} `;
-    }
-    gapAreaPath += "Z";
-  }
+
+    return {
+      techPath: tPath,
+      narPath: nPath,
+      fotnPath: fPath,
+      gapAreaPath: gAreaPath
+    };
+  }, [timelineData, getX, getY, getYFotn]);
 
   // Active cursor index
   const currentIndex = timelineData.findIndex(pt => pt.date === currentDate);

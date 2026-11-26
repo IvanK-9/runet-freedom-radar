@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Send, ShieldAlert, Shield, AlertTriangle, CheckCircle, RotateCcw } from 'lucide-react';
+import { X, Sparkles, Send, CheckCircle, RotateCcw } from 'lucide-react';
 
 export default function SimulatorModal({ onClose, onAddSimulatedEvent, onResetEvents, customCount }) {
   const [headline, setHeadline] = useState('');

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Pause, RotateCcw, FastForward, Calendar, Clock, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Pause, RotateCcw, FastForward, Clock } from 'lucide-react';
 
 export default function TimeScrubber({ 
   timelineData, 
@@ -10,12 +10,17 @@ export default function TimeScrubber({
   const currentIndex = timelineData.findIndex(pt => pt.date === currentDate);
   const safeIndex = currentIndex === -1 ? timelineData.length - 1 : currentIndex;
 
+  const safeIndexRef = useRef(safeIndex);
+  useEffect(() => {
+    safeIndexRef.current = safeIndex;
+  }, [safeIndex]);
+
   // Auto-play through time
   useEffect(() => {
     let interval = null;
     if (isPlaying) {
       interval = setInterval(() => {
-        const nextIdx = (safeIndex + 1) % timelineData.length;
+        const nextIdx = (safeIndexRef.current + 1) % timelineData.length;
         onSelectDate(timelineData[nextIdx].date);
         if (nextIdx === timelineData.length - 1) {
           setIsPlaying(false);
@@ -23,7 +28,7 @@ export default function TimeScrubber({
       }, 700);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, safeIndex, timelineData, onSelectDate]);
+  }, [isPlaying, timelineData, onSelectDate]);
 
   const currentPoint = timelineData[safeIndex] || timelineData[timelineData.length - 1];
 
@@ -104,6 +109,8 @@ export default function TimeScrubber({
           min="0"
           max={timelineData.length - 1}
           value={safeIndex}
+          aria-label="Временная шкала 2016-2026"
+          aria-valuetext={currentPoint.displayDate}
           onChange={(e) => {
             setIsPlaying(false);
             const idx = parseInt(e.target.value, 10);

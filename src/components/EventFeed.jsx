@@ -6,10 +6,8 @@ import {
   Shield, 
   AlertTriangle, 
   Calendar, 
-  Cpu, 
   Layers,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from 'lucide-react';
 
 export default function EventFeed({ 
@@ -23,7 +21,6 @@ export default function EventFeed({
   const [timeScope, setTimeScope] = useState('all'); // 'window' or 'all'
 
   const currentYear = new Date(currentDate).getFullYear();
-  const currentMonth = new Date(currentDate).getMonth() + 1;
 
   // Filtered events
   const filteredEvents = useMemo(() => {

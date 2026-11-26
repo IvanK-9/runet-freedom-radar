@@ -1,5 +1,5 @@
 import React from 'react';
-import { Radio, Sparkles, BookOpen, Shield, ShieldAlert, Activity, RefreshCw, Zap } from 'lucide-react';
+import { Radio, Sparkles, BookOpen, Activity, RefreshCw, Zap } from 'lucide-react';
 
 export default function Header({ 
   onOpenSimulator, 
@@ -8,8 +8,7 @@ export default function Header({
   totalEvents,
   fotnScore,
   currentYear,
-  deltaGap,
-  gapStatus
+  deltaGap
 }) {
   return (
     <header className="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-40">

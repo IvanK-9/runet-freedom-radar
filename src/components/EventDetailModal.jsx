@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, Calendar, Shield, ShieldAlert, AlertTriangle, ExternalLink, Cpu, Hash } from 'lucide-react';
+import { X, Calendar, Shield, ShieldAlert, AlertTriangle, Cpu } from 'lucide-react';
 
 export default function EventDetailModal({ event, onClose }) {
   useEffect(() => {

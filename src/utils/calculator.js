@@ -76,14 +76,37 @@ export function getNarrativeStatus(score) {
 }
 
 /**
+ * Безопасный парсинг даты YYYY-MM-DD без сдвига часовых поясов UTC
+ */
+function parseSafeDate(d) {
+  if (typeof d === 'string' && d.includes('-')) {
+    const parts = d.split('-').map(Number);
+    return {
+      year: parts[0],
+      month: parts[1],
+      day: parts[2] || 1,
+      time: new Date(parts[0], parts[1] - 1, parts[2] || 1).getTime()
+    };
+  }
+  const dateObj = new Date(d);
+  return {
+    year: dateObj.getFullYear(),
+    month: dateObj.getMonth() + 1,
+    day: dateObj.getDate(),
+    time: dateObj.getTime()
+  };
+}
+
+/**
  * Двухконтурный расчет: Индекс Нарратива (I_nar) и Индекс Физики Сети (I_tech)
  * @param {Array} events - Список событий
  * @param {Date|string} targetDate - Целевая дата
  * @param {number} halfLifeDays - Период полураспада влияния события (по умолчанию 180 дней)
  */
 export function calculateBalanceAtDate(events, targetDate, halfLifeDays = 180) {
-  const targetTime = new Date(targetDate).getTime();
-  const targetYear = new Date(targetDate).getFullYear();
+  const targetParsed = parseSafeDate(targetDate);
+  const targetTime = targetParsed.time;
+  const targetYear = targetParsed.year;
   const decayConstant = Math.log(2) / (halfLifeDays * 24 * 60 * 60 * 1000);
 
   const fotn = getFotnForYear(targetYear);
@@ -94,7 +117,8 @@ export function calculateBalanceAtDate(events, targetDate, halfLifeDays = 180) {
   let activeEventsCount = 0;
 
   events.forEach(event => {
-    const eventTime = new Date(event.date).getTime();
+    const eventParsed = parseSafeDate(event.date);
+    const eventTime = eventParsed.time;
     if (eventTime > targetTime) return;
 
     const diffMs = targetTime - eventTime;
@@ -249,8 +273,8 @@ export function generateTimelineSeries(events) {
       const fotn = getFotnForYear(year);
 
       const eventsThisMonth = events.filter(e => {
-        const eDate = new Date(e.date);
-        return eDate.getFullYear() === year && eDate.getMonth() + 1 === month;
+        const parsed = parseSafeDate(e.date);
+        return parsed.year === year && parsed.month === month;
       });
 
       points.push({
